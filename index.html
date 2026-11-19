@@ -1,0 +1,151 @@
+Build a complete, modern, mobile-first web application (PWA – Progressive Web App) called "GoalMaster PRO: Ultimate Football Hub". The app must work as a premium browser-based football game that players can install on their mobile home screen and that deploys seamlessly to GitHub Pages.
+
+======================================================================
+0. GITHUB PAGES & STATIC HOSTING REQUIREMENTS (CRITICAL)
+======================================================================
+- 100% Static Frontend Architecture: Build using pure Vanilla HTML5, CSS3, and modern JavaScript (ES6+). Do NOT require a backend server, database, Node.js runtime, or mandatory build step (no webpack/npm build required to run). It must work immediately when uploaded directly to a GitHub repository and served via GitHub Pages.
+- Strict Relative Paths Only: Every link, stylesheet, script, icon, and PWA reference MUST use relative paths (e.g., `./css/styles.css`, `./js/state.js`, `./manifest.json`, `./sw.js`). NEVER use root-absolute paths starting with `/` (such as `/css/styles.css`), because GitHub Pages hosts project sites in a subdirectory (`https://username.github.io/repo-name/`).
+- Root Entry File: Place `index.html`, `manifest.json`, `sw.js`, and a `.nojekyll` file directly in the repository root.
+- Modular File Structure: Organize code cleanly into separate files so it is easy to upload, maintain, and expand on GitHub:
+  - `index.html`
+  - `manifest.json` & `sw.js` (configured with relative scope `./` for GitHub Pages)
+  - `css/styles.css`
+  - `js/config.js` (payment links, feature flags, demo checkout toggle)
+  - `js/state.js` (player state, localStorage persistence, Base64 export/import)
+  - `js/i18n.js` (multi-language translations)
+  - `js/audio.js` (Web Audio API synthesizer + mobile haptics)
+  - `js/data-questions.js` (quiz questions, daily challenges, president dilemmas)
+  - `js/data-players.js` (transfer timelines, higher/lower stats, grid database, missing XI squads, collectible cards)
+  - `js/modes.js` (logic for all 10 game modes)
+  - `js/shop-monetization.js` (dual-currency economy, VIP, Season Pass, packs, checkout handler, ad slots)
+  - `js/app.js` (router, UI renderer, animations, notifications)
+
+======================================================================
+1. VISUAL DESIGN, UX & CORE SYSTEMS
+======================================================================
+- Visual Theme: Premium dark stadium aesthetic (deep emerald-black `#070d0a`, dark cards `#15241c`, neon pitch green `#10b981`, luxury gold `#f5b942` for VIP elements, violet-cyan accents for Gems/Legends). Include subtle glassmorphism, smooth transitions, 3D card-flip animations for pack openings, animated number count-ups, gentle card shake on wrong answers, and confetti celebrations on rank-ups or jackpots.
+- Navigation: Responsive bottom tab bar on mobile (`Home`, `Squad & Packs`, `Pass & Quests`, `Shop`, `Profile`) for one-handed play, paired with a sleek sticky top header showing Hearts, Coins, Gems, VIP badge, language selector, and sound toggle.
+- Audio & Haptics: Built-in Web Audio API sound synthesizer (UI clicks, correct chimes, error buzzers, referee whistle, goal celebration, coin clinks, rare pack reveal, VIP fanfare) with mute toggle and optional mobile vibration (`navigator.vibrate`).
+- Persistence & Cloud-Free Sync: Save all progress automatically to `localStorage`. Include an "Export / Import Save Code" feature (Base64 encoded string) in Profile so players can back up or transfer progress and unlocked items across devices.
+- Multi-Language Support (i18n): Full translation architecture supporting 12 languages (primary complete sets for EN, SK, CZ, plus UI switchers for ES, DE, FR, IT, PT, PL, TR, NL, HR) with automatic browser language detection and clean English fallback.
+- Custom UI Feedback: NEVER use native browser `alert()` or `confirm()`. Use custom styled modals and a queued toast notification system so multiple unlocked badges or rewards never overlap.
+
+======================================================================
+2. GAME MODES (10 FULLY PLAYABLE MODES)
+======================================================================
+Every mode must have its own dedicated view, score tracking, Coin/XP rewards, and personal best records:
+
+1. CLASSIC FOOTBALL QUIZ (100+ verified factual questions):
+   - Categories: All Leagues, Champions League, Premier League, La Liga & Serie A, World Cup & EURO, SK & CZ Football, Football Rules & Tactics, and VIP Legends (VIP/DLC).
+   - 15-second countdown timer, shuffled answer options, and an interesting factual explanation after every answer.
+   - "Sudden Death (Survival)" sub-mode: no timer, one mistake ends the run, escalating Coin multipliers for high streaks.
+   - Lifelines: VAR 50/50, Freeze Timer (+10s), Skip/Swap Question.
+
+2. WHO AM I? TRANSFER DETECTIVE (30+ players):
+   - Displays a chronological career timeline of clubs, years, and transfer fees in €.
+   - 5 attempts per player; each wrong guess unlocks a progressive clue (nationality, position, preferred foot, biggest trophy, initials).
+   - Accent-insensitive and typo-tolerant matching plus smart autocomplete suggestions while typing.
+   - Free tier limit of 3 plays/day (refillable with Coins/Gems, or unlimited for VIP).
+
+3. HIGHER OR LOWER (40+ players, 4 selectable metrics):
+   - Players choose the comparison stat: Career Goals, Peak Market Value (€M), Major Trophies Won, or International Caps.
+   - Animated count-up reveal on the challenger card, winning card shifts left, streak counter with multiplier rewards.
+
+4. CLUB PRESIDENT: YES / NO (60+ managerial dilemmas):
+   - 4 dynamic club meters: Finances, Fans, Dressing Room, Board (hitting 0% or extreme 100% triggers dismissal with dramatic news headline).
+   - Decisions covering blockbuster transfers, Saudi Pro League offers, stadium expansion, VAR controversies, youth academy, sponsors, and Financial Fair Play.
+   - Conversion hook: First 5 weeks of a season are FREE to play as a trial; Week 6+ prompts players to unlock via VIP, Season Pass, or the standalone "Club President PRO" DLC.
+
+5. FOOTBALL GRID 3x3 (TIC-TAC-TOE TRIVIA):
+   - 3 rows × 3 columns combining clubs, nationalities, and major trophies (e.g., Real Madrid + Chelsea).
+   - 9 guesses to complete the grid with valid unique players.
+   - Calculates a "Rarity Score" and features a deterministic Daily Grid (same grid for all players based on date).
+
+6. MISSING XI (LEGENDARY LINEUPS):
+   - Visual green tactical football pitch displaying formations (4-3-3, 4-4-2, 3-5-2) from iconic matches (e.g., UCL Final 2024, Slovakia vs. Italy WC 2010, Spain EURO 2024, Barcelona 2011).
+   - Each pitch slot shows jersey number, position, and nationality flag; players fill in the missing names against the clock.
+
+7. PENALTY SHOOTOUT (INTERACTIVE SKILL MINI-GAME):
+   - Visual goal with animated goalkeeper and 6 target zones (top/bottom corners and center).
+   - Moving power/accuracy bar (stopping in the green sweet spot = unstoppable top-bin shot; red zone = miss/crossbar).
+   - 5-kick series + sudden death, plus a Knockout Tournament Bracket (Quarter-Final, Semi-Final, Final) with Coin entry fee and prize jackpot.
+
+8. DEAL TABLE (TRANSFER NEGOTIATION MINI-GAME):
+   - Fast-paced timing mini-game set in the transfer deadline room.
+   - Stop a moving indicator inside the shrinking green zone (3 attempts) to slash a superstar's transfer fee and win agent commission in Coins.
+
+9. PACK OPENING & DREAM XI (COLLECTIBLE CARD METAGAME):
+   - Open collectible player packs (Bronze, Silver, Gold, Champions, Icon/Legend) with dramatic walkout reveal animations (Flag -> Position -> Club -> Name + OVR rating 75–99).
+   - Build a starting 11 (Dream XI) on an interactive pitch from collected cards.
+   - Higher Team OVR and chemistry grant passive global perks across all modes (e.g., +10% Coins, +2s quiz timer, higher crit bonus chance).
+   - Convert duplicate cards into Coins or use them to upgrade existing cards.
+
+10. DAILY CHALLENGE & SHAREABLE RESULTS (WORDLE STYLE):
+    - Resets automatically at midnight with a live countdown timer; deterministic "Match of the Day" (1 Quiz + 1 Transfer Detective + 1 Stat Duel) identical for all players worldwide.
+    - "Share Result" button copying a spoiler-free emoji summary (green/red squares, streak, rank, and link to the GitHub Pages URL) to clipboard.
+
+======================================================================
+3. PROGRESSION, RETENTION & COMMUNITY
+======================================================================
+- Player Profile & Stats: Custom manager name, selectable club crest, overall accuracy %, total games played, longest streak, and per-mode high scores.
+- Rank Ladder (XP System): 12 ranks from "Academy Youth" to "Ballon d'Or Legend" plus a Prestige reset badge for veterans.
+- 7-Day Login Calendar: Escalating daily rewards (Day 1: 50 Coins, Day 3: Gold Pack, Day 5: 25 Gems, Day 7: Mega Chest + 24h Free VIP Trial).
+- Daily & Weekly Quests: 3 daily missions and 3 weekly challenges with progress bars and one-tap Claim buttons.
+- Hall of Fame (25+ Achievements): Multi-tier unlockable trophies rewarding Coins and Gems.
+- Weekly Division League (Simulated Leaderboard): Earn weekly points to promote through divisions (Bronze -> Silver -> Gold -> Champions -> Top 100 Elite).
+
+======================================================================
+4. COMPREHENSIVE MONETIZATION & PAYMENT SYSTEM
+======================================================================
+Design a high-converting, visually polished "SHOP & VIP HUB" with multiple real-money monetization streams while keeping the free experience genuinely fun.
+
+A) DUAL-CURRENCY ECONOMY:
+- Coins (🪙): Soft currency earned via gameplay, quests, and streaks. Used for standard packs, heart refills, tournament entries, and lifelines.
+- Gems / Golden Balls (💎): Hard premium currency. Earned sparingly via major milestones, primarily purchased with real money. Used for Icon/Legend packs, Streak Savers, cosmetics, Season Pass tier skips, and unlocking special content.
+
+B) READY-TO-SELL PAYMENT GATEWAY ARCHITECTURE:
+- Create a centralized `PAYMENT_CONFIG` object in `js/config.js` holding checkout URLs for every real-money product (compatible with Stripe Payment Links, LemonSqueezy Checkout, or PayPal.me).
+- Automatic URL Unlock Handler: When a buyer returns from checkout with a query parameter (e.g., `?unlock=vip_lifetime`, `?unlock=season_pass`, `?unlock=starter_pack`, `?unlock=gems_1100`), automatically grant the item, save it to `localStorage`, strip the query parameter via `history.replaceState`, and trigger a celebratory unlock modal.
+- Activation & Promo Code System: Support redeemable gift/VIP codes (including built-in owner test codes) inside the Shop.
+- Built-in Demo Checkout Mode: Add a `DEMO_MODE: true` flag in `js/config.js` so the site owner can test every real-money purchase flow locally or on GitHub Pages before pasting live Stripe/LemonSqueezy URLs.
+
+C) COMPLETE REAL-MONEY STORE CATALOG (€):
+1. NEWCOMER STARTER PACK (€1.99 – one-time offer with 24h countdown, "-75% OFF" badge):
+   - Includes: 300 💎 + 2,500 🪙 + 1 Guaranteed Icon Card (90+ OVR) + 7 Days Ad-Free.
+2. VIP CLUB MONTHLY SUBSCRIPTION (€3.99 / month):
+   - Unlimited Hearts (❤️ ∞), Zero Ads, 2× Coins & XP, free lifelines (VAR & X-Ray), unlocked Club President & VIP Legends, unlimited Transfer Detective, daily +25 💎 login stipend, Gold VIP badge.
+3. VIP LEGEND LIFETIME PASS (€12.99 one-time, "BEST INVESTMENT" badge):
+   - Permanent VIP benefits forever + exclusive animated "FOUNDER" profile frame + all future DLC modes included + instant +500 💎 bonus.
+4. SEASON PASS / BATTLE PASS (€4.99 per season):
+   - 30 reward tiers with a dual track: Free Track on top, Premium Track underneath (locked until purchased).
+   - Players earn Season XP and see locked premium rewards accumulating, unlocking all reached premium tiers retroactively upon purchase.
+   - Include "Skip 1 Tier" for 50 💎 and "Season Pass + 10 Tiers Bundle" for €7.99.
+5. GEM STORE (💎 – 5 value-anchored tiers):
+   - Handful: 150 💎 – €1.49
+   - Pouch: 450 💎 (+15% Bonus) – €3.99
+   - Chest: 1,100 💎 (+30% Bonus, "🔥 MOST POPULAR" badge) – €8.99
+   - Vault: 2,800 💎 (+50% Bonus) – €19.99
+   - Chairman Pack: 7,000 💎 (+80% Bonus, "👑 BEST VALUE" badge) – €39.99
+6. STANDALONE DLC PACKS (for non-VIP players):
+   - Remove Ads Forever – €2.49
+   - Club President PRO (Full Seasons + Extra Scenarios) – €2.99
+   - Football Legends & Historic XI Pack – €2.49
+   - Team of the Year Mega Pack (3 Guaranteed 92+ OVR Cards) – €4.99
+7. COSMETIC STORE (buyable with 💎 or €):
+   - Unlockable live stadium themes (Wembley Night, Golden Arena, Neon Cyber Pitch, Retro 90s Turf) that dynamically switch CSS variables across the entire app.
+   - Animated avatar frames, rare card borders, and custom stadium chants.
+
+D) SMART IN-GAME MICRO-OFFERS:
+- Streak Saver: When a player with a 5+ streak makes a mistake, pop up a 5-second offer: "Save your streak for 25 💎 (or instant €0.99 micro-pack)!"
+- Out-of-Hearts Modal: Instant choice between refilling with Coins, watching an optional Rewarded Ad, or activating VIP.
+- Rotating Daily Flash Deal in the Shop with a live countdown timer.
+
+E) CLEAN AD SLOTS (FREE USERS ONLY):
+- Clean bottom banner container ready for Google AdSense script injection (strictly NO gambling or betting copy—by default displays an internal promo for VIP or Daily Challenge; completely hidden for VIP and Remove Ads owners).
+- Optional "Rewarded Ad" slot (simulated 5-second countdown ready to hook into an ad network) granting +1 Heart, +50 🪙, or 1 free lifeline.
+
+======================================================================
+5. CODE QUALITY & ACCURACY
+======================================================================
+- Ensure all football trivia facts, transfer histories, career goal counts, and historical starting lineups are factually accurate.
+- Code must be clean, well-commented, responsive across mobile (360px+) and desktop, and produce zero console errors when opened directly or hosted on GitHub Pages.
